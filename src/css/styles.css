@@ -69,7 +69,7 @@ h1 {
 }
 .reset-game {
   float: right;
-  margin: 2rem;
+  /* margin: 2rem; */
 }
 
 .clue-container {
