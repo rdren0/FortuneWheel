@@ -32,7 +32,9 @@ class Game {
   createRound (wheel) {
     this.roundCount++;
     if (this.roundCount === 4) {
-      // let wheel = new BonusWheel();    
+      alert("You have solved every level of puzzle!");
+      alert("The page will now reload");
+      location.reload();
     }
     let round = new Round(this.players, wheel);
     this.round = round;
