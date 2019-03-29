@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import Wheel from "./Wheel.js";
+// import Wheel from "./Wheel.js";
 
 export default {
 
@@ -16,9 +16,7 @@ export default {
     return players;
   },
 
-  resetGame () {
-    location.reload();
-  },
+  
 
   fillSpace(puzzleLength, end) {
     const extraSpace = 14 - puzzleLength;
@@ -51,6 +49,7 @@ export default {
 
   appendPuzzle (line1, line2) {
     // parameters instead, split.puzzle and null
+    $('.puzzle').html(' ');
     this.fillSpace(line1.length, false);
     this.appendWords(line1);
     this.fillSpace(line1.length, true);
@@ -62,42 +61,38 @@ export default {
     }
   },
 
-  displaySolvedPuzzle() {
-    $('.secret').removeClass('secret');
-  },
-
 
   setCategoryText(category) {
     $('.clue-container').text(category)
   },
 
-  spinWheel(game, wheel) {
-    let clicks = 1;
-    const winner = Math.round(Math.random() * 21);
+  spinWheel(game) {
+    // let clicks = 1;
+    // 
     /*multiply the degree by number of clicks
     generate random number between 1 - 360, 
     then add to the new degree*/
-    const extraDegree = (21 - winner) * 36;
-    const spinAgain = (1800 * clicks) + extraDegree;
-    const totalDegree = Math.round(spinAgain / 36) * 150;
-    wheel = game.round.currentWheel
-    
-
-    wheel.spinWinner(winner, game.round);
-    clicks++;
-    $('#inner').css({
-      'transform': 'rotate(' + totalDegree + 'deg)'
-    });
-    this.spinResultMessage(wheel.currentSpin);
+    // const extraDegree = (21 - winner) * 36;
+    // const spinAgain = (1800 * clicks) + extraDegree;
+    // const totalDegree = Math.round(spinAgain / 36) * 150;
+    // wheel = game.round.currentWheel;
+    // wheel.spinWinner(winner, game.round);
+    // clicks++;
+    $('#inner').toggleClass('spin-wheel');
+    // $('#inner').css({
+    //   'transform': 'rotate(' + 1800 + 'deg)'
+    // });
+    // this.spinResultMessage(wheel.currentSpin);
     $('#wheel').removeClass('pulse');
-
   },
+
+
 
   updateActivePlayer(oldPlayer, newPlayer, player) {
     this.yourTurnMessage(player);
     $(`#player${oldPlayer}-area`).removeClass('active');
     $(`#player${newPlayer}-area`).addClass('active'); 
-    $('#wheel').addClass('pulse').delay(600);
+    $('#wheel').addClass('pulse');
   },
   
   spinAgainPrompt() {
@@ -106,11 +101,11 @@ export default {
   
   spinResultMessage(spinResult) {
     if (spinResult === "BANKRUPT" || spinResult === "LOSE A TURN") {
-      $('.spin-winner').html(`Sorry, you spun ${spinResult}! Next Player Spins!`)
+      // $('.spin-winner').html(`Sorry, you spun ${spinResult}! Your turn is over.`)
+      alert(`Bummer! You spun ${spinResult} :( `);
 
     } else {
       $('.spin-winner').html(`You spun ${spinResult}! Choose a letter.`);
-
     }
   },
 
@@ -139,72 +134,85 @@ export default {
     });
   },
     
-  buyAVowel(event, game) {
-    $('.vowels').on('click', (event) => {
-      $( '.vowels').removeClass( "cost");
-      game.round.players[game.round.activePlayer].roundScore -= 100;
-      game.round.guessLetter(event, game);
-    });
-  },
+  // buyAVowel(event, game) {
+  //   $('.vowels').on('click', (event) => {
+  //     $( '.vowels').removeClass( "cost");
+  //     game.round.players[game.round.activePlayer].roundScore -= 100;
+  //     game.round.guessLetter(event, game);
+  //   });
+  // },
 
     
-  displayScore(player, total) {
-    $(`#player-${player}-round`).text(`Score: ${total}`);
+  displayRoundScore(player, points) {
+    $(`#player-${player}-round`).text(`Score: ${points}`);
+  },
+
+  displaySolvedPuzzle() {
+    $('.secret').removeClass('secret');
+  
+    // setTimeout("game.round.nextRound(game.round.players[game.round.activePlayer]);", 3000)
+  },
+
+  displayTotalScore(winner, score) {
+    $(`#player-${winner + 1}-total`).text(`TOTAL: ${score}`);
   },
   
   checkSolution(event, game) {
     event.preventDefault();
     let guess = $('.solve-input').val();
-    let variable = game.round.handleSolutionGuess(guess);
-    if (variable) {
-      game.round.updateTotalScore();
-      let gridContainer = `<div class="grid-container top">
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-            <div class="puz-grid top-row"></div>
-          </div> 
-          <div class="grid-container puzzle"></div>
-          <div class="grid-container bottom">
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-            <div class="puz-grid btm-row"></div>
-          </div> `;
-      $('.puzzle-grid-container').html(gridContainer);
-      // wheel = new Wheel(game, data.wheel)
-      game.wheel = new Wheel();
-      game.createRound(game.wheel)
-      this.updateRoundText(this.roundCount)
-
-    } else {
-      alert('You guessed incorrectly!')
-    }
+    game.round.handleSolutionGuess(guess, game);
+    $('.solve-input').val('');
   }
+  //   let variable = game.round.handleSolutionGuess(guess);
+  //   if (variable) {
+  //     game.round.updateTotalScore();
+  //     let gridContainer = `<div class="grid-container top">
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //           <div class="puz-grid top-row"></div>
+  //         </div> 
+  //         <div class="grid-container puzzle"></div>
+  //         <div class="grid-container bottom">
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //           <div class="puz-grid btm-row"></div>
+  //         </div> `;
+  //     $('.puzzle-grid-container').html(gridContainer);
+  //     // wheel = new Wheel(game, data.wheel)
+  //     game.wheel = new Wheel();
+  //     game.createRound(game.wheel)
+  //     this.updateRoundText(this.roundCount)
+
+  //   } else {
+  //     alert('You guessed incorrectly!')
+  //   }
+  // }
 
 
 

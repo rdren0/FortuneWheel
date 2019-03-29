@@ -1,5 +1,6 @@
 import Puzzle from "./Puzzle.js";
 import domUpdates from "./domUpdates.js";
+import Game from "./Game.js"
 
 class Round {
   constructor(players, wheel, puzzle) {
@@ -44,84 +45,81 @@ class Round {
   }
   
   newTurn() {
-    const player = this.players[this.activePlayer-1];
+    const player = this.players[this.activePlayer];
     this.changeActivePlayers()
-    domUpdates.yourTurnMessage(player);
   }
 
-  updatePlayerScore(spinValue) {
+  updateRoundScore(spinValue) {
     const player = this.players[this.activePlayer];
     spinValue === 0 ? player._roundScore = 0 : player.roundScore += spinValue;
-
-    domUpdates.displayScore(player.playerNumber, player.roundScore)
+    domUpdates.displayRoundScore(player.playerNumber, player.roundScore)
   }
 
-  handleCorrectLetterChosen(splitAnswer, chosenLetter) {
-    const spinValue = this.currentWheel.currentSpin
+  handleCorrectLetterChosen(splitAnswer, chosenLetter, spinValue) {
+    // const spinValue = this.currentWheel.currentSpin
     splitAnswer.forEach(letter => {
       if (chosenLetter === letter) {
-        this.updatePlayerScore(spinValue);
+        this.updateRoundScore(spinValue);
         domUpdates.displayCorrectLetter(splitAnswer, chosenLetter);
         domUpdates.spinAgainPrompt();
       }
     });
   }
+  checkPuzzleForLetter(splitAnswer, chosenLetter) {
+    return splitAnswer.includes(chosenLetter);
+  }
 
   guessLetter(event, game) {
     const splitAnswer = game.round.currentPuzzle.splitAnswer;
     const chosenLetter = event.currentTarget.innerText;
-    if (!this.vowels.includes(event.currentTarget.innerText)) {
-      this.letterIsConsonant(splitAnswer, chosenLetter)
-    } else {
-      if (this.players[this.activePlayer]._roundScore >= 100) {
-        this.vowelGuess(splitAnswer, chosenLetter);
-      } else {
+    const guesserScore = this.players[this.activePlayer]._roundScore;
+    const vowel = this.vowels.includes(chosenLetter);
+    let spinValue = this.currentWheel.currentSpin;
+
+    switch (true) {
+      case (guesserScore < 100 && vowel):
         alert("You dont have enough money to buy a vowel!");
-      }
+        break;
+      case (!this.checkPuzzleForLetter(splitAnswer, chosenLetter)):
+       alert('Nope, that letter is not in the puzzle!')
+       this.newTurn();
+       break;
+      case (vowel && guesserScore >= 100):
+        this.players[this.activePlayer]._roundScore -= 100;
+        this.handleCorrectLetterChosen(splitAnswer, chosenLetter, 0);
+        break;
+      default:
+        this.handleCorrectLetterChosen(splitAnswer, chosenLetter, spinValue);
     }
   }
 
-  vowelGuess(splitAnswer, chosenLetter) {
-    this.players[this.activePlayer]._roundScore -= 100;
-    domUpdates.displayScore(this.players[this.activePlayer].playerNumber, this.players[this.activePlayer]._roundScore)
-    if (splitAnswer.includes(chosenLetter)) {
-      splitAnswer.forEach(letter => {
-        this.roundCountDown--;
-        if (chosenLetter === letter) {
-          domUpdates.displayCorrectLetter(splitAnswer, chosenLetter);
-          domUpdates.spinAgainPrompt();
-        }
-      })
-
-    } else {
-      this.newTurn();
-    }
-  }
-  
-  letterIsConsonant(splitAnswer, chosenLetter) {
-    if (splitAnswer.includes(chosenLetter)) {
-      this.handleCorrectLetterChosen(splitAnswer, chosenLetter)
-    } else {
-      this.newTurn();
-    }
-  }
-
-  handleSolutionGuess(guess) {
-    const solution = this.currentPuzzle.correctAnswer.toUpperCase();
-    if (guess.toUpperCase() === solution) {
+  handleSolutionGuess(guess, game) {
+    let winner = this.players[this.activePlayer];
+    if (this.currentPuzzle.solvePuzzle(guess)) {
       domUpdates.displaySolvedPuzzle();
-      domUpdates.solvePuzzleMessage(this.players[this.activePlayer]);
-      return true;
+      this.updateTotalScore(winner);
+      setTimeout("alert('You solved the puzzle!');", 2000);
+      this.nextRound(winner, game)
+    } else {
+      alert('Aw, you tried!');
     }
   }
 
-  updateTotalScore() {
-    let player = this.players[this.activePlayer]
+  updateTotalScore(player) {
     player.totalScore += player._roundScore;
-    player._roundScore = 0;
-    // domUpdates.displayTotalScore(player, player.totalScore)
+    domUpdates.displayTotalScore(this.activePlayer, player.totalScore);
   }
 
+  nextRound(winner, game) {
+    console.log('NEW ROUND')
+
+    this.updateTotalScore(winner);
+    this.players.forEach((player, index) => {
+      player._roundScore = 0;
+      domUpdates.displayRoundScore(index, 0);
+    });
+    game.createRound(this.currentWheel);
+  }
 
 }
 

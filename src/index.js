@@ -22,20 +22,22 @@ $('.continue-button').on('click', (e) =>{
 })
 
 $('#reset-button').on('click', () =>{
-  domUpdates.resetGame();
+  game.resetGame();
 })
 
 $('#wheel').on('click', () => {
+  game.round.currentWheel.spinWinner(game);
   domUpdates.spinWheel(game);
 })
 
-$('.consonant ').on('click', (e) =>{
+$('.consonant').on('click', (e) =>{
   game.round.guessLetter(e, game);
 })
 
 $('.submit-guess').on('click', (e) => {
   domUpdates.checkSolution(e, game);
 })
+
 $('.vowel').on('click', (e) => {
   game.round.guessLetter(e, game);
 });
