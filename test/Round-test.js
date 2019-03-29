@@ -8,7 +8,7 @@ import spies from 'chai-spies';
 import domUpdates from "../src/domUpdates.js";
 chai.use(spies);
 const expect = chai.expect;
-chai.spy.on(domUpdates, ['turnOrder', 'buyAVowel', 'displayScore', 'displayCorrectAnswers', 'displaySolvedPuzzle', 'updateActivePlayer'], () => true);
+chai.spy.on(domUpdates, ['turnOrder', 'buyAVowel', 'displayScore', 'displayCorrectAnswers', 'displaySolvedPuzzle', 'updateActivePlayer','displayCorrectLetters', 'spinAgainPrompt', 'checkSolution', 'yourTurnMessage'], () => true);
 chai.spy.on(domUpdates, ['playerNames'], () => ["name", "name", "name"]);
 
 describe('Round', () => {
@@ -18,7 +18,8 @@ describe('Round', () => {
   let players = [player1, player2];
   let game = new Game();
   let wheel = new Wheel()
-  let letter = `<div>e</div>`;
+  let event  = { currentTarget: { innerText: 'X' } };
+
 
   beforeEach(() => {
     round = new Round(players);
@@ -33,17 +34,12 @@ describe('Round', () => {
     expect(round.roundCountDown).to.equal(0);
   });
 
-
-
   it('should change activePlayer', () =>{
     expect(round.activePlayer).to.equal(0);
     round.changeActivePlayers();
     expect(round.activePlayer).to.equal(1);
   });
 
-
-
-//needs to be written VVVV ////
   it('should update activePlayers score', () =>{
     let currentPlayer = round.players[round.activePlayer];
     expect(currentPlayer._roundScore).to.equal(0);
@@ -51,25 +47,28 @@ describe('Round', () => {
     expect(currentPlayer._roundScore).to.equal(100);
   });
 
-  it('should check if a guess is a vowel or consonant', () =>{
-    game.startGame();
-    // game.createRound(wheel);
-    // game.getRandomData();
-    round.guessLetter(letter, game);
-    expect(round.vowelGuess).to.have.been.called();
-   
+  it('update the totalScore of the roundWinner', () =>{
+    let currentPlayer = round.players[round.activePlayer];
+    expect(currentPlayer._roundScore).to.equal(100);
+    round.updatePlayerScore(0);
+    expect(currentPlayer._roundScore).to.equal(0);
+    domUpdates.checkSolution();
+    expect(currentPlayer.totalScore).to.equal(0);
   });
 
-  // it('should check if a guess is correct', () =>{
-   
-  // });
+  it('should check if a guess is a vowel or consonant', () =>{
+    game.startGame();
+    round.guessLetter(event, game);
+    expect(round.vowelGuess).to.have.been.called();
+  });
 
-  // it('update the totalScore of the roundWinner', () =>{
-    
-  // });
-
-
-
+  it('should check if a guess is correct', () =>{
+    game.startGame();
+    round.guessLetter(event, game);
+    expect(round.vowelGuess).to.have.been.called();
+    expect(domUpdates.displayCorrectLetters).to.have.been.called();
+    expect(domUpdates.spinAgainPrompt).to.have.been.called();
+  });
 });
 
 

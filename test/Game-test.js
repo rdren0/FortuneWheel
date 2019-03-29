@@ -1,7 +1,9 @@
 import Game from "../src/Game.js";
+import Round from "../src/Round.js"
+import domUpdates from "../src/domUpdates.js"
+import data from '../src/data.js'
 import chai from 'chai'
 import spies from 'chai-spies';
-import domUpdates from "../src/domUpdates.js"
 chai.use(spies);
 const expect = chai.expect;
 
@@ -11,8 +13,12 @@ chai.spy.on(domUpdates, ['appendPuzzle', 'setCategoryText', 'hiddenBoard'], () =
 
 describe('Game', () => {
   let game;
+  let round;
+  let Data = data.puzzles.one_word_answers
+
   beforeEach(() => {
     game = new Game();
+    round = new Round()
   });
   it('should be an instance of Game', () => {
     expect(game).to.be.an.instanceof(Game);
@@ -37,7 +43,7 @@ describe('Game', () => {
 
   it.skip('should increase rounds by one', () =>{
     expect(game.roundCount).to.equal(0);
-    game.createRound(true);
+    round.getPuzzle(game)
     expect(game.roundCount).to.equal(1);
 
   })

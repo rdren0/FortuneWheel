@@ -120,12 +120,6 @@ class Round {
     });
     game.createRound(this.currentWheel);
   }
-  // congratulate winner
-  // round score 0, total score updated
-  // update round number
-  // append new puzzle
-
-
 
 }
 
