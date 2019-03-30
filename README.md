@@ -35,6 +35,12 @@ $ npm install
 
 This will download the file and install the dependencies needed to properly access and run the application.
 
+#### Once the downloads are complete, run
+```shell
+$ npm start
+```
+
+If it doesn't open a browser window automatically, navigate to your browser and go to http://localhost:8080/ to view the application.
 
 
 ## Features
@@ -46,8 +52,13 @@ This will download the file and install the dependencies needed to properly acce
 
 ## Future Goals
 
-* Move to a new round successfully
-* Move to BonusWheel
+* The winner of round 3 should move to a bonus round with a bonus wheel for round 4
+* Additions to UI
+  - Append different values to wheel for each round
+  - Avatar choice for player
+  - Instructions
+  - Replace alerts with DOM messages
 * Disable letter in word bank once guessed
+
 
 
